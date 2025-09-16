@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEW PayCore-Okta Integration</title>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PT Sans', Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .infographic {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .client-vendor {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .client-vendor div {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .timeline-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .timeline-header {
+            text-align: center;
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .timeline {
+            position: relative;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            overflow-x: auto;
+            padding: 20px 0;
+            flex-wrap: nowrap !important;
+            width: 100%;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #9b59b6);
+            z-index: 1;
+        }
+
+        .timeline-item {
+            background: white;
+            border: 4px solid #3498db;
+            border-radius: 20px;
+            width: 180px;
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 2;
+            position: relative;
+            transition: transform 0.3s ease;
+            padding: 10px;
+            flex-shrink: 0;
+            margin: 0 5px;
+        }
+
+        .task-list {
+            margin-top: 8px;
+            font-size: 0.6em;
+            font-weight: normal;
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .task-list div {
+            margin: 2px 0;
+            color: #666;
+        }
+
+        .timeline-item:hover {
+            transform: scale(1.1);
+        }
+
+        .timeline-item.highlight {
+            border-color: #e74c3c;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .duration {
+            font-size: 0.8em;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .grid-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .objectives-icon {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+
+        .scope-icon {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+
+        .success-icon {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+        }
+
+        .risks-icon {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .list-item {
+            background: #f8f9fa;
+            margin: 8px 0;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            font-size: 0.95em;
+            transition: background 0.3s ease;
+        }
+
+        .list-item:hover {
+            background: #e3f2fd;
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .phases-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .phase-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .phase-card:hover::before {
+            transform: rotate(45deg) translate(100%, 100%);
+        }
+
+        .phase-number {
+            font-size: 3em;
+            font-weight: bold;
+            opacity: 0.3;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .phase-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .phase-items {
+            list-style: none;
+        }
+
+        .phase-items li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .phase-items li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .timeline {
+                justify-content: flex-start;
+                padding: 20px 10px;
+                overflow-x: scroll;
+            }
+
+            .timeline::before {
+                top: 50%;
+                left: 10px;
+                right: 10px;
+            }
+
+            .timeline-item {
+                width: 160px;
+                height: 140px;
+                font-size: 0.7em;
+                margin: 0 5px;
+                min-width: 160px;
+            }
+
+            .task-list {
+                font-size: 0.55em;
+            }
+
+            .phase-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .grid-section {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .client-vendor {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .client-vendor div {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .infographic {
+                padding: 10px;
+            }
+
+            .header, .timeline-section, .stats-section, .phases-section {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+
+            .timeline-header {
+                font-size: 1.6em;
+                margin-bottom: 20px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .card h3 {
+                font-size: 1.3em;
+            }
+
+            .stat-number {
+                font-size: 2em;
+            }
+
+            .phase-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .header .subtitle {
+                font-size: 1em;
+            }
+
+            .timeline-item {
+                width: 140px;
+                height: 120px;
+                font-size: 0.65em;
+            }
+
+            .task-list {
+                font-size: 0.5em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 1.8em;
+            }
+
+            .card h3 {
+                font-size: 1.2em;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .card-icon {
+                margin: 0;
+            }
+
+            .list-item {
+                padding: 10px 12px;
+                font-size: 0.9em;
+            }
+
+            .infographic {
+                padding: 5px;
+            }
+
+            .header, .timeline-section, .stats-section, .phases-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="infographic">
+        <!-- Header -->
+        <div class="header">
+            <h1>PayCore HRIS - Okta Integration</h1>
+            <div class="subtitle">Identity Management System Modernization</div>
+            <div class="client-vendor">
+                <div>Client: All Elite Wrestling (AEW)</div>
+                <div>Vendor: Iron Cove</div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="stats-section">
+            <h2 style="text-align: center; font-size: 2em; color: #2c3e50; margin-bottom: 20px;">Executive Summary</h2>
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-top: 20px;">
+                <p style="line-height: 1.7; font-size: 1.1em; text-align: justify; margin-bottom: 20px;">
+                    All Elite Wrestling (AEW) is undertaking a strategic identity management modernization initiative focused on <strong>integrating Paycor HRIS with Okta</strong> to streamline user management and access processes. The group explored automation opportunities through API integration and Okta Workflows, with the goal of simplifying current manual processes and improving identity lifecycle management. The session concluded with a review of <strong>Iron Cove's proposed role</strong> in providing integration support, a health check of the existing Okta environment, and project planning under a retainer model. This comprehensive engagement will eliminate manual user provisioning processes, establish automated lifecycle management, and create a scalable foundation for future growth while delivering 95% reduction in manual tasks, zero data synchronization errors, and enhanced security posture through role-based access controls.
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 25px;">
+                    <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <div style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">8-11 Weeks</div>
+                        <div style="font-size: 0.9em; opacity: 0.9;">Project Timeline</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <div style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">95%</div>
+                        <div style="font-size: 0.9em; opacity: 0.9;">Manual Task Reduction</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <div style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">6 Phases</div>
+                        <div style="font-size: 0.9em; opacity: 0.9;">Comprehensive Scope</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                        <div style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">Zero Errors</div>
+                        <div style="font-size: 0.9em; opacity: 0.9;">Data Sync Target</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline-section">
+            <div class="timeline-header">Project Timeline</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div>Discovery</div>
+                    <div class="duration">Phase 1</div>
+                    <div class="task-list">
+                        <div>• Okta Health Check</div>
+                        <div>• PayCore API Research</div>
+                        <div>• Process Mapping</div>
+                        <div>• Attribute Mapping</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div>Development</div>
+                    <div class="duration">Phase 2</div>
+                    <div class="task-list">
+                        <div>• Security Optimization</div>
+                        <div>• Governance Setup</div>
+                        <div>• Performance Tuning</div>
+                        <div>• Monitoring Config</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div>Testing</div>
+                    <div class="duration">Phase 3</div>
+                    <div class="task-list">
+                        <div>• One-Way Sync Setup</div>
+                        <div>• Workflow Development</div>
+                        <div>• Sandbox Testing</div>
+                        <div>• Employee ID Integration</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div>Deployment</div>
+                    <div class="duration">Phase 4</div>
+                    <div class="task-list">
+                        <div>• Production Rollout</div>
+                        <div>• Monitoring Setup</div>
+                        <div>• Documentation</div>
+                        <div>• Training Materials</div>
+                    </div>
+                </div>
+                <div class="timeline-item highlight">
+                    <div>Go-Live</div>
+                    <div class="duration">Phase 5</div>
+                    <div class="task-list">
+                        <div>• Post-Implementation</div>
+                        <div>• Support & Optimization</div>
+                        <div>• Knowledge Transfer</div>
+                        <div>• Troubleshooting</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Metrics and KPIs Section -->
+        <div class="stats-section">
+            <h2 style="text-align: center; font-size: 2em; color: #2c3e50; margin-bottom: 10px;">Success Metrics & KPIs</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 20px;">
+                
+                <!-- Operational Efficiency -->
+                <div style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; padding: 25px; border-radius: 15px; text-align: center;">
+                    <h3 style="margin-bottom: 20px; font-size: 1.4em;">Operational Efficiency</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">95%</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Manual Task Reduction</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">15min</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Max Sync Time</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">100%</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Automated Provisioning</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">24/7</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">System Monitoring</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security & Compliance -->
+                <div style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 25px; border-radius: 15px; text-align: center;">
+                    <h3 style="margin-bottom: 20px; font-size: 1.4em;">Security & Compliance</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">Zero</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Data Sync Errors</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">100%</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Audit Trail Coverage</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">99.9%</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">System Uptime</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">RBAC</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Access Controls</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Experience -->
+                <div style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 25px; border-radius: 15px; text-align: center;">
+                    <h3 style="margin-bottom: 20px; font-size: 1.4em;">User Experience</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">SSO</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Single Sign-On</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">5sec</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Average Login Time</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">MFA</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">Multi-Factor Auth</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 2.2em; font-weight: bold; margin-bottom: 5px;">98%</div>
+                            <div style="font-size: 0.9em; opacity: 0.9;">User Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- KPI Dashboard -->
+            <div style="margin-top: 30px; background: white; border-radius: 15px; padding: 25px; border: 2px solid #ecf0f1;">
+                <h3 style="text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 1.4em;">Key Performance Indicators (KPIs)</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #2ecc71;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">< 30 sec</div>
+                        <div style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 5px;">Account Provisioning Time</div>
+                        <div style="color: #2ecc71; font-size: 0.8em; font-weight: bold;">Target: ✓ Achieved</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #3498db;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">< 5 min</div>
+                        <div style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 5px;">Profile Update Sync</div>
+                        <div style="color: #3498db; font-size: 0.8em; font-weight: bold;">Target: In Progress</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #f39c12;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">1 min</div>
+                        <div style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 5px;">Account Deactivation</div>
+                        <div style="color: #f39c12; font-size: 0.8em; font-weight: bold;">Target: Baseline</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #e74c3c;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">99.5%</div>
+                        <div style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 5px;">Integration Reliability</div>
+                        <div style="color: #e74c3c; font-size: 0.8em; font-weight: bold;">Target: Critical</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #9b59b6;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">80%</div>
+                        <div style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 5px;">HR Process Automation</div>
+                        <div style="color: #9b59b6; font-size: 0.8em; font-weight: bold;">Target: Strategic</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #34495e;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">50hrs</div>
+                        <div style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 5px;">Monthly Time Savings</div>
+                        <div style="color: #34495e; font-size: 0.8em; font-weight: bold;">Target: Efficiency</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Key Stats -->
+        <div class="stats-section">
+            <h2 style="text-align: center; font-size: 2em; color: #2c3e50; margin-bottom: 10px;">Project Metrics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Reduction in Manual Tasks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">Minutes Max Sync Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">8-11</div>
+                    <div class="stat-label">Total Project Weeks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">10-15</div>
+                    <div class="stat-label">Weekly Hours Commitment</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phases -->
+        <div class="phases-section">
+            <h2 style="text-align: center; font-size: 2em; color: #2c3e50; margin-bottom: 10px;">Implementation Phases</h2>
+            <div class="phase-grid">
+                <div class="phase-card">
+                    <div class="phase-number">1</div>
+                    <div class="phase-title">Core Integration</div>
+                    <ul class="phase-items">
+                        <li>Okta Health Check</li>
+                        <li>PayCore API Research</li>
+                        <li>One-Way Sync Setup</li>
+                        <li>Security Optimization</li>
+                        <li>Workflow Development</li>
+                    </ul>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-number">2</div>
+                    <div class="phase-title">Future Enhancements</div>
+                    <ul class="phase-items">
+                        <li>Bi-directional Sync</li>
+                        <li>Concur Integration</li>
+                        <li>Additional App Integrations</li>
+                        <li>Advanced Reporting</li>
+                        <li>Enhanced Automation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Cards -->
+        <div class="grid-section">
+            <div class="card">
+                <h3>
+                    <div class="card-icon objectives-icon">🎯</div>
+                    Project Objectives
+                </h3>
+                <div class="list-item">Automated user lifecycle management</div>
+                <div class="list-item">Eliminate manual Airtable processes</div>
+                <div class="list-item">Implement audit trails & compliance</div>
+                <div class="list-item">Create scalable integration foundation</div>
+                <div class="list-item">Optimize Okta configuration</div>
+            </div>
+
+            <div class="card">
+                <h3>
+                    <div class="card-icon success-icon">📊</div>
+                    Success Criteria
+                </h3>
+                <div class="list-item">Zero data synchronization errors</div>
+                <div class="list-item">Complete audit trail coverage</div>
+                <div class="list-item">Scalable for growth projections</div>
+                <div class="list-item">15-minute max update time</div>
+                <div class="list-item">95% manual task reduction</div>
+            </div>
+
+            <div class="card">
+                <h3>
+                    <div class="card-icon risks-icon">⚠️</div>
+                    Risk Mitigation
+                </h3>
+                <div class="list-item">Early PayCore API research</div>
+                <div class="list-item">Careful data migration planning</div>
+                <div class="list-item">Timeline coordination</div>
+                <div class="list-item">Comprehensive sandbox testing</div>
+                <div class="list-item">Regular communication checkpoints</div>
+            </div>
+        </div>
+
+        <!-- Okta & Paycor Engagement Scope - Standalone Page -->
+        <div class="stats-section">
+            <h2 style="text-align: center; font-size: 2em; color: #2c3e50; margin-bottom: 10px;">Okta & Paycor Engagement Scope</h2>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+                    
+                    <!-- Left Column -->
+                    <div>
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #3498db;">
+                            <h4 style="color: #3498db; margin-bottom: 15px; font-size: 1.2em;">1. Okta Assessment & Best Practices</h4>
+                            <div class="list-item" style="margin: 10px 0;">Review current Okta instance and identify immediate concerns</div>
+                            <div class="list-item" style="margin: 10px 0;">Provide administration best practices and optimization recommendations</div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #2ecc71;">
+                            <h4 style="color: #2ecc71; margin-bottom: 15px; font-size: 1.2em;">2. Paycor as HRaaM for Lifecycle Management</h4>
+                            <div class="list-item" style="margin: 10px 0;">Deploy Paycor as authoritative source of employee data</div>
+                            <div class="list-item" style="margin: 10px 0;">Analyze employee profiles, attributes, groups, and lifecycle states</div>
+                            <div class="list-item" style="margin: 10px 0;">Evaluate client readiness and develop future-state planning</div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #f39c12;">
+                            <h4 style="color: #f39c12; margin-bottom: 15px; font-size: 1.2em;">3. Paycor ↔ Okta Configuration</h4>
+                            <div class="list-item" style="margin: 10px 0;">Configure automation for Create, Update, and Terminate events</div>
+                            <div class="list-item" style="margin: 10px 0;">Define group rules, username policies, and process triggers</div>
+                            <div class="list-item" style="margin: 10px 0;">Set up Okta Agent and appropriate privileges</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #e74c3c;">
+                            <h4 style="color: #e74c3c; margin-bottom: 15px; font-size: 1.2em;">4. Application Deployment & Integration</h4>
+                            <div class="list-item" style="margin: 10px 0;">Configure application groups and integrations</div>
+                            <div class="list-item" style="margin: 10px 0;">Implement user management and import policies</div>
+                            <div class="list-item" style="margin: 10px 0;">Integrate SSO for applicable apps with lifecycle management</div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #9b59b6;">
+                            <h4 style="color: #9b59b6; margin-bottom: 15px; font-size: 1.2em;">5. Knowledge Transfer & Collaboration</h4>
+                            <div class="list-item" style="margin: 10px 0;">Deliver training for Okta administrators</div>
+                            <div class="list-item" style="margin: 10px 0;">Collaborate with AEWrestling IT team for seamless integration</div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #34495e;">
+                            <h4 style="color: #34495e; margin-bottom: 15px; font-size: 1.2em;">6. Migration & Technical Recommendations</h4>
+                            <div class="list-item" style="margin: 10px 0;">Execute transition to Paycor as profile master</div>
+                            <div class="list-item" style="margin: 10px 0;">Provide comprehensive audit report and technical recommendations</div>
+                            <div class="list-item" style="margin: 10px 0;">Conduct technical working sessions with AEWrestling cloud engineers</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Obligations Section -->
+        <div class="stats-section">
+            <h2 style="text-align: center; font-size: 2em; color: #2c3e50; margin-bottom: 10px;">Customer Obligations</h2>
+            <div style="background: linear-gradient(135deg, #34495e, #2c3e50); color: white; padding: 30px; border-radius: 15px; margin-top: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px;">
+                    
+                    <!-- Left Column -->
+                    <div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #3498db;">
+                            <h4 style="margin-bottom: 12px; color: #3498db; font-size: 1.1em;">🔐 System Access Requirements</h4>
+                            <p style="line-height: 1.5; font-size: 0.95em; margin-bottom: 8px;">Provide full access to third-party services, software, or meta-data to facilitate configuration and testing activities.</p>
+                            <p style="line-height: 1.5; font-size: 0.95em;">Provide and test all necessary remote access by ICS to Client systems prior to commencement of professional services.</p>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2ecc71;">
+                            <h4 style="margin-bottom: 12px; color: #2ecc71; font-size: 1.1em;">📋 Licensing & Administration</h4>
+                            <p style="line-height: 1.5; font-size: 0.95em; margin-bottom: 8px;">Procure services or software with appropriate license rights necessary to complete the configuration.</p>
+                            <p style="line-height: 1.5; font-size: 0.95em;">Client must own and provide admin access to any administration tenant where applicable.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #f39c12;">
+                            <h4 style="margin-bottom: 12px; color: #f39c12; font-size: 1.1em;">📢 Communication Management</h4>
+                            <p style="line-height: 1.5; font-size: 0.95em;">User communication will be transferred to client and distributed and released by client.</p>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #e74c3c;">
+                            <h4 style="margin-bottom: 12px; color: #e74c3c; font-size: 1.1em;">✅ Data Quality Assurance</h4>
+                            <p style="line-height: 1.5; font-size: 0.95em;">Ensure completeness and accuracy of all data provided for integration and configuration purposes.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bottom Summary Bar -->
+                <div style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+                    <h4 style="margin-bottom: 15px; color: #ecf0f1;">📋 Client Responsibility Checklist</h4>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+                        <span style="background: rgba(52, 152, 219, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 0.9em; border: 1px solid #3498db;">Third-Party Access</span>
+                        <span style="background: rgba(46, 204, 113, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 0.9em; border: 1px solid #2ecc71;">Remote Connectivity</span>
+                        <span style="background: rgba(243, 156, 18, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 0.9em; border: 1px solid #f39c12;">License Procurement</span>
+                        <span style="background: rgba(231, 76, 60, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 0.9em; border: 1px solid #e74c3c;">Admin Permissions</span>
+                        <span style="background: rgba(155, 89, 182, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 0.9em; border: 1px solid #9b59b6;">Data Accuracy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Us Section -->
+        <div class="stats-section">
+            <h2 style="text-align: center; font-size: 2em; color: #2c3e50; margin-bottom: 10px;">About Iron Cove Solutions</h2>
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-top: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: center;">
+                    <div>
+                        <h3 style="font-size: 1.5em; margin-bottom: 15px; color: #fff;">Identity & Access Management Experts</h3>
+                        <p style="line-height: 1.6; margin-bottom: 15px;">Iron Cove Solutions specializes in enterprise identity management, helping organizations streamline their authentication and authorization processes through cutting-edge technology solutions.</p>
+                        <p style="line-height: 1.6;">Our team of certified experts delivers comprehensive IAM strategies that enhance security, improve user experience, and drive operational efficiency.</p>
+                    </div>
+                    <div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">200+</div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">Successful Integrations</div>
+                            </div>
+                            <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">10+</div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">Years Experience</div>
+                            </div>
+                            <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">24/7</div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">Support Coverage</div>
+                            </div>
+                            <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                                <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">99.9%</div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">Uptime Guarantee</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 25px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.2); text-align: center;">
+                    <h4 style="margin-bottom: 15px;">Core Services</h4>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+                        <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.9em;">Okta Implementation</span>
+                        <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.9em;">HRIS Integration</span>
+                        <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.9em;">SSO Configuration</span>
+                        <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.9em;">Security Optimization</span>
+                        <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.9em;">Licenses Management</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
